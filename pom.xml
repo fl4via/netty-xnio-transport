@@ -116,7 +116,7 @@
       <groupId>org.jboss.xnio</groupId>
       <artifactId>xnio-nio</artifactId>
       <version>${xnio.version}</version>
-      <scope>test</scope>
+      <!-- <scope>test</scope> -->
     </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
@@ -124,6 +124,11 @@
       <version>${jboss.logging.version}</version>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.jboss.xnio</groupId>
+          <artifactId>xnio-api</artifactId>
+          <version>3.6.5.Final</version>
+      </dependency>
   </dependencies>
 
   <properties>
