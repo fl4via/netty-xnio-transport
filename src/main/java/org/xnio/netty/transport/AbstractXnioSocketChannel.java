@@ -177,7 +177,7 @@ abstract class AbstractXnioSocketChannel  extends AbstractChannel implements Soc
                             break;
                         }
                     }
-
+                    boolean isAllByteBuf = true;
                     if (done) {
                         // Release all buffers
                         for (int i = msgCount; i > 0; i --) {
@@ -195,6 +195,7 @@ abstract class AbstractXnioSocketChannel  extends AbstractChannel implements Soc
 
                         for (int i = msgCount; i > 0; i --) {
                             if (in.current() != null && ! (in.current() instanceof ByteBuf)) {
+                                isAllByteBuf = false;
                                 break;
                             }
                             final ByteBuf buf = (ByteBuf) in.current();
@@ -217,7 +218,11 @@ abstract class AbstractXnioSocketChannel  extends AbstractChannel implements Soc
                         }
 
                         incompleteWrite(setOpWrite);
+                        if (isAllByteBuf)
+                            break;
                     }
+                    if (isAllByteBuf)
+                        continue;
                 }
             }
             Object msg = in.current();
@@ -274,6 +279,10 @@ abstract class AbstractXnioSocketChannel  extends AbstractChannel implements Soc
                 long flushedAmount = 0;
                 if (writeSpinCount == -1) {
                     writeSpinCount = config().getWriteSpinCount();
+                }
+                if (region.transferred() >= region.count()) {
+                    in.remove();
+                    continue;
                 }
                 for (int i = writeSpinCount - 1; i >= 0; i --) {
                     long localFlushedAmount = region.transferTo(sink, region.transfered());
